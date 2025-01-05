@@ -1,0 +1,99 @@
+plugins {
+    id 'java'
+    id 'application'
+    id 'org.springframework.boot' version '2.7.18'
+    id 'io.spring.dependency-management' version '1.1.5'
+    id "com.github.spotbugs" version "5.0.15"
+}
+
+group = 'org.example'
+version = '1.0-SNAPSHOT'
+
+java {
+    sourceCompatibility = JavaVersion.VERSION_11
+    targetCompatibility = JavaVersion.VERSION_11
+}
+
+application {
+    mainClass = 'org.example.SpringBootDemoApplication'
+}
+
+repositories {
+    mavenCentral()
+    mavenLocal()
+    gradlePluginPortal()
+}
+
+dependencies {
+    // *** spring ***
+    // https://mvnrepository.com/artifact/org.springframework.boot/spring-boot-starter
+    implementation group: 'org.springframework.boot', name: 'spring-boot-starter', version: '2.7.18'
+    // https://mvnrepository.com/artifact/io.spring.gradle/dependency-management-plugin
+//    implementation group: 'io.spring.gradle', name: 'dependency-management-plugin', version: '1.1.5'
+    // https://mvnrepository.com/artifact/org.springframework.boot/spring-boot-starter-web
+    implementation 'org.springframework.boot:spring-boot-starter-web:2.7.18'
+    // *** log4j2 ***
+    // https://mvnrepository.com/artifact/org.springframework.boot/spring-boot-starter-logging
+    implementation group: 'org.springframework.boot', name: 'spring-boot-starter-logging', version: '2.7.18'
+    // https://mvnrepository.com/artifact/org.springframework.boot/spring-boot-starter-log4j2
+    implementation group: 'org.springframework.boot', name: 'spring-boot-starter-log4j2', version: '2.7.18'
+    // *** lombok ***
+    // https://mvnrepository.com/artifact/org.projectlombok/lombok
+    compileOnly group: 'org.projectlombok', name: 'lombok', version: '1.18.34'
+    annotationProcessor group: 'org.projectlombok', name: 'lombok', version: '1.18.34'
+
+    // spotbugs
+    // https://mvnrepository.com/artifact/com.github.spotbugs/spotbugs
+//    implementation group: 'com.github.spotbugs', name: 'spotbugs', version: '4.8.6', ext: 'pom'
+    // https://mvnrepository.com/artifact/com.github.spotbugs/spotbugs-annotations
+    implementation group: 'com.github.spotbugs', name: 'spotbugs-annotations', version: '4.8.6'
+// https://mvnrepository.com/artifact/com.github.spotbugs/com.github.spotbugs.gradle.plugin
+    implementation group: 'com.github.spotbugs', name: 'com.github.spotbugs.gradle.plugin', version: '6.0.26', ext: 'pom'
+// https://mvnrepository.com/artifact/com.github.spotbugs.snom/spotbugs-gradle-plugin
+    implementation group: 'com.github.spotbugs.snom', name: 'spotbugs-gradle-plugin', version: '6.0.26'
+
+    //
+    testImplementation platform('org.junit:junit-bom:5.10.0')
+    testImplementation 'org.junit.jupiter:junit-jupiter'
+}
+
+test {
+    useJUnitPlatform()
+}
+
+spotbugs {
+//    toolVersion = "4.8.6" // SpotBugs tool version (align with plugin if possible)
+    ignoreFailures = true // Continue build even if SpotBugs finds bugs (use with caution)
+    effort = com.github.spotbugs.snom.Effort.MAX // Analysis effort (min, default, max)
+//    reportLevel = com.github.spotbugs.snom.Confidence.HIGH// Report level (low, medium, high)
+    reportLevel = com.github.spotbugs.snom.Confidence.valueOf("LOW")
+    reportsDir = file("$buildDir/reports/spotbugs") // Custom reports directory
+//    excludeFilter = file("path/to/spotbugs-exclude.xml") // Exclude specific bugs
+//    includeFilter = file("path/to/spotbugs-include.xml") // Include specific bugs
+    showStackTraces = true
+    showProgress = true
+    maxHeapSize = '1g'
+//    reports {
+//        html.enabled = true
+//        xml.enabled = false
+//    }
+}
+
+tasks.spotbugsMain {
+    reports.create("html") {
+        required = true
+        outputLocation = file("$buildDir/reports/spotbugs.html")
+        setStylesheet("fancy-hist.xsl")
+    }
+}
+
+spotbugsTest {
+    ignoreFailures = true
+}
+
+//tasks.withType(com.github.spotbugs.snom.SpotBugsTask) {
+//    reports {
+//        xml.enabled = true
+//        html.enabled = true
+//    }
+//}
